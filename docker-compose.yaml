@@ -1,0 +1,81 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sgas-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sgas
+    ports:
+      - "5432:5432"
+    volumes:
+      - sgas-postgres-data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:latest
+    container_name: sgas-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+
+  minio:
+    image: minio/minio:latest
+    container_name: sgas-minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+    volumes:
+      - sgas-minio-data:/data
+
+  # MODIFIÉ — context pointe maintenant vers le sous-dossier sgas-backend1
+  # (ce fichier docker-compose.yml vit désormais au niveau parent, plus
+  # à l'intérieur de sgas-backend1).
+  backend:
+    image: amissan27/sgas-backend:1.0.0
+    build:
+      context: ./sgas-backend1
+      dockerfile: Dockerfile
+    container_name: sgas-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+      - minio
+    env_file:
+      - ./sgas-backend1/.env
+    environment:
+      DB_HOST: postgres
+      AWS_S3_ENDPOINT: http://minio:9000
+      # URL publique (résolvable depuis le navigateur de l'utilisateur,
+      # pas seulement depuis le réseau Docker interne) utilisée pour les
+      # liens de téléchargement renvoyés au frontend — voir uploads.service.ts
+      AWS_S3_PUBLIC_URL: http://localhost:9000
+
+  # MODIFIÉ — context pointe vers ./sgas-frontend1 (sous-dossier direct,
+  # plus besoin de remonter avec ../)
+  frontend:
+    image: amissan27/sgas-frontend:1.0.0
+    build:
+      context: ./sgas-frontend1
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: sgas-frontend
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
+volumes:
+  sgas-postgres-data:
+  sgas-minio-data:

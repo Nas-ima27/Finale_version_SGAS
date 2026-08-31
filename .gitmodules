@@ -1,0 +1,8 @@
+[submodule "sgas-backend1"]
+	path = sgas-backend1
+	url = https://github.com/Nas-ima27/SGAS1.git
+	branch = recovery/backend-clean-20260901
+[submodule "sgas-frontend1"]
+	path = sgas-frontend1
+	url = https://github.com/Nas-ima27/test.git
+	branch = recovery/frontend-clean-20260901

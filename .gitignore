@@ -1,0 +1,46 @@
+# ==========================================
+# SGAS - Root Git repository
+# ==========================================
+
+# Dependencies
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/dist-ssr/
+**/build/
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# Keep example environment files
+!**/.env.example
+
+# Logs
+**/*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Coverage
+**/coverage/
+**/.nyc_output/
+
+# TypeScript build info
+**/*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+**/.temp/
+**/.tmp/
